@@ -1,21 +1,25 @@
-# ViExam: Are Vision Language Models Better than Humans on Vietnamese Multimodal Exam Questions?
+# VMMU: A Vietnamese Multitask Multimodal Understanding and Reasoning Benchmark
 
 <div align="center">    
   <p style="font-size: 20px;">by 
-    <a href="https://www.linkedin.com/in/dang-thi-tuong-vy-00a357278/">Vy Tuong Dang</a><sup>*</sup>,
-    <a href="https://anvo25.github.io/">An Vo</a><sup>*</sup>,
-    <a href="https://www.linkedin.com/in/quang-tau-a708b4238/?originalSubdomain=kr">Quang Tau</a>, 
-    <a href="https://www.resl.kaist.ac.kr/members/master-student#h.fiaa4al7sz8u">Duc Dm</a>, 
-    <a href="https://www.resl.kaist.ac.kr/members/director">Daeyoung Kim</a>
-  </p>
-  <p>
-    <sup>*</sup>Equal contribution<br>
-    KAIST
+    <a href="https://www.linkedin.com/in/dang-thi-tuong-vy-00a357278/">Vy Tuong Dang</a><sup>*1</sup>,
+    <a href="https://anvo25.github.io/">An Vo</a><sup>*1,2</sup>,
+    <a href="http://villacu.github.io/">Emilio Villa-Cueva</a><sup>2</sup>,
+    <a href="https://www.linkedin.com/in/quang-tau-a708b4238/?originalSubdomain=kr">Quang Tau</a><sup>1</sup>, 
+    <a href="https://www.resl.kaist.ac.kr/members/master-student#h.fiaa4al7sz8u">Duc Dm</a><sup>1</sup>, 
+    <a href="https://mbzuai.ac.ae/study/faculty/thamar-solorio/">Thamar Solorio</a><sup>2</sup>,
+    <a href="https://www.resl.kaist.ac.kr/members/director">Daeyoung Kim</a><sup>1</sup>
   </p>
 
-[![Project Page](https://img.shields.io/badge/Project_Page-viexam.github.io-blue.svg)](https://vi-exam.github.io/)
+  <p>
+    <sup>*</sup>Equal contribution<br>
+    <sup>1</sup>KAIST &nbsp;&nbsp;
+    <sup>2</sup>MBZUAI
+  </p>
+
+[![Project Page](https://img.shields.io/badge/Project_Page-vmmu-bench.github.io-blue.svg)](https://vmmu-bench.github.io/)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.13680-b31b1b.svg)](https://arxiv.org/abs/2508.13680)
-[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Dataset-yellow.svg)](https://huggingface.co/datasets/anvo25/viexam)
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Dataset-yellow.svg)](https://huggingface.co/datasets/anvo25/vmmu)
 [![Code License](https://img.shields.io/badge/Code_License-MIT-green.svg)](LICENSE)
 
 </div>
