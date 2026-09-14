@@ -7,6 +7,8 @@ import google.generativeai as genai
 
 thread_local = {}
 
+API_KEY_ENV = "GEMINI_API_KEY"
+
 def get_api_key_path():
     """Returns the default path for the Gemini API key."""
     return "api_key/gemini_key.txt"
@@ -19,22 +21,44 @@ def get_client(api_key):
         thread_local[thread_id] = genai
     return thread_local[thread_id]
 
-def make_api_call(api_key, model, prompt, image_path, temperature):
+def make_api_call(api_key, model, prompt, image_path=None, temperature=0):
     client = get_client(api_key)
-    image = Image.open(image_path)
-    
+
+    # Build content based on whether image_path is provided
+    contents = []
+
+    if image_path:
+        image = Image.open(image_path)
+        contents.append(image)
+
+    contents.append(prompt)
+
+    # System instruction to make Gemini follow the {{Z}} answer format
+    system_instruction = (
+        "Bạn là trợ lý trả lời câu hỏi trắc nghiệm. "
+        "QUY TẮC BẮT BUỘC về định dạng đáp án:\n"
+        "- Đáp án cuối cùng PHẢI có dạng {{Z}} với dấu ngoặc nhọn kép {{}}\n"
+        "- VÍ DỤ ĐÚNG: {{Z}}\n"
+        "- VÍ DỤ SAI: \\boxed{Z}, $\\boxed{Z}$, [A], (A)\n"
+        "- TUYỆT ĐỐI KHÔNG sử dụng LaTeX \\boxed hoặc bất kỳ ký hiệu toán học nào\n"
+        "- Chỉ dùng {{}} với dấu ngoặc nhọn kép cho đáp án cuối cùng"
+    )
+
     for attempt in range(3):
         try:
             generation_config = genai.types.GenerationConfig(
                 temperature=temperature
             )
-            # Use GenerativeModel instead of client.models.generate_content
-            model_instance = client.GenerativeModel(model)
+            # Use GenerativeModel with system_instruction
+            model_instance = client.GenerativeModel(
+                model,
+                system_instruction=system_instruction
+            )
             response = model_instance.generate_content(
-                contents=[image, prompt],
+                contents=contents,
                 generation_config=generation_config
             )
-            
+
             # Normalize the response to resemble other APIs
             response_text = ""
             try:
@@ -48,24 +72,25 @@ def make_api_call(api_key, model, prompt, image_path, temperature):
 
             return {"content": [{"type": "text", "text": response_text}], "model": model, "usage": {}}
         except Exception as e:
-            print(f"Attempt {attempt+1} failed for {image_path}: {e}")
-            if attempt < 2: 
-                print(f"Retrying in 60 seconds...")
-                time.sleep(60)
+            error_location = image_path if image_path else "text-only request"
+            print(f"Attempt {attempt+1} failed for {error_location}: {e}")
+            if attempt < 2:
+                print(f"Retrying in 30 seconds...")
+                time.sleep(30)
             else:
                 raise
 
 def process_item(item, api_key, model, temperature, prompt_lang):
     item_id = item['ID']
-    image_path = item['image_path']
-    
+    image_path = item.get('image_path')  # Use .get() to allow None
+
     prompt_key = f"{prompt_lang}_prompt"
     if prompt_key not in item:
         print(f"ERROR: Item {item_id} is missing '{prompt_key}'. Skipping.")
         return None
-        
+
     prompt_text = item[prompt_key]
-    
+
     try:
         response_dict = make_api_call(api_key, model, prompt_text, image_path, temperature)
         item_with_response = item.copy()

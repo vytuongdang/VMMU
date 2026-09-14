@@ -1,0 +1,15 @@
+# Evaluation: api_code/, batch_api_code/, src/result.py, vmmu_dataset.py
+openai>=1.0
+anthropic
+google-generativeai
+cohere>=5.0
+requests
+datasets>=2.14
+Pillow>=8.0.0
+numpy>=1.21.0
+pandas
+
+# Data pipeline: src/convert_pdf_to_image.py, src/cut_question.py
+opencv-python
+pytesseract>=0.3.10
+pdf2image>=1.17.0

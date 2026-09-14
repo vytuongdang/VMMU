@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+
+# Images downloaded from Hugging Face by vmmu_dataset.py
+dataset/hf/

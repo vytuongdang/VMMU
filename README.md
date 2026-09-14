@@ -29,10 +29,10 @@
 ## 📌 Abstract
 
 <p align="center">
-  <img src="images/question_image.jpg" alt="ViExam Dataset Overview" width="80%"/>
+  <img src="images/question_image.jpg" alt="VMMU Dataset Overview" width="80%"/>
 </p>
 
-*Vision Language Models (VLMs) demonstrate remarkable capabilities on English multimodal tasks, but their performance on low-resource languages with genuinely multimodal educational content remains largely unexplored. In this work, we introduce **ViExam**, the first comprehensive Vietnamese multimodal exam benchmark containing **2,548 multimodal questions** across 7 academic domains. We find that state-of-the-art VLMs achieve only **57.74%** accuracy while underperforming average Vietnamese test-takers (66.54%). Only the thinking VLM o3 (74.07%) exceeds human average performance, yet still falls substantially short of human best performance (99.60%). Cross-lingual prompting with English instructions while maintaining Vietnamese content fails to improve performance, decreasing accuracy by 1 percentage point for SOTA VLMs. Human-in-the-loop collaboration can partially improve VLM performance by 5 percentage points. Our work presents the first systematic evaluation of VLM capabilities on Vietnamese multimodal educational content.*
+*Vision language models are predominantly evaluated on English-centric multimodal benchmarks, leaving their behavior in other languages and cultures insufficiently understood. We introduce **VMMU**, a Vietnamese Multitask Multimodal Understanding and Reasoning benchmark of **2,548 multiple-choice questions** across seven domains: Mathematics, Physics, Chemistry, Biology, Geography, Driving Test, and IQ Test. Every question requires jointly reasoning over Vietnamese text and non-text visual evidence (charts, diagrams, tables, traffic scenes), and is distributed as a single rendered page image. We evaluate 10 open-source and 5 closed-source VLMs on VMMU. Test-time compute improves performance from **57%** to **78%** accuracy, but it remains inferior to an expert baseline (**99%** accuracy). Extensive error analyses show that closed-source VLMs already achieve strong Vietnamese OCR performance, yet still struggle on VMMU. This suggests that the primary bottleneck is **multimodal grounding and reasoning** rather than text recognition or Vietnamese language understanding. The dataset is available on [Hugging Face](https://huggingface.co/datasets/anvo25/vmmu).*
 
 ---
 
@@ -64,7 +64,7 @@ Use these challenging Vietnamese multimodal exam questions where most tested mod
 **If you just want to evaluate VLMs on our Vietnamese exam questions:**
 
 🔥 **Download the complete dataset from Hugging Face** with full images and annotations:
-- Go to our [Hugging Face dataset](https://huggingface.co/datasets/username/viexam)
+- Go to our [Hugging Face dataset](https://huggingface.co/datasets/anvo25/vmmu)
 - Download ready-to-use Vietnamese multimodal exam questions
 
 This is the fastest way to get started with evaluation.
@@ -80,14 +80,14 @@ Please follow the installation and generation steps below to run the complete pi
 ## 💻 Getting Started
 
 ```bash
-git clone https://github.com/TuongVy20522176/ViExam.git
-cd viexam
+git clone https://github.com/vytuongdang/VMMU.git
+cd VMMU
 pip install -r requirements.txt
 ```
 
 ## 📊 Tasks
 
-ViExam spans **7 distinct domains** representative of Vietnamese educational assessments:
+VMMU spans **7 distinct domains** representative of Vietnamese educational assessments:
 
 ### Academic Subjects (Tasks 1-5)
 - **Mathematics**: Function analysis, calculus, geometry (456 questions)
@@ -112,40 +112,66 @@ ViExam spans **7 distinct domains** representative of Vietnamese educational ass
 pip install -r requirements.txt
 ```
 
-### 2. Run evaluation on VLMs
+### 2. Add your API key
 
-```bash
-# Prepare evaluation batches
-python batch_api_code/main_batch_prepare.py \
-  --model claude-sonnet-4-20250514 \
-  --input-file dataset/metadata/full_vqa.json \
-  --prompt_language vn
+Set the environment variable of the provider you use (or put the key in its file under `api_key/`):
 
-# Execute batch evaluation
-python batch_api_code/main_batch_api.py
-```
+| Provider | Environment variable | Key file | Models |
+| --- | --- | --- | --- |
+| OpenAI | `OPENAI_API_KEY` | `api_key/openai_key.txt` | `gpt-*`, `o3-*` |
+| Anthropic | `ANTHROPIC_API_KEY` | `api_key/claude_key.txt` | `claude-*` |
+| OpenRouter | `OPENROUTER_API_KEY` | `api_key/openrouter_key.txt` | `google/gemini-*`, `qwen/*`, `meta-llama/*`, `mistralai/*`, ... |
+| Google | `GEMINI_API_KEY` | `api_key/gemini_key.txt` | `gemini-*` with `--provider gemini` |
+| Cohere | `COHERE_API_KEY` | `api_key/cohere_key.txt` | `c4ai-aya-vision-*` |
 
-Or for individual models:
+### 3. Run evaluation on VLMs
+
+The dataset is downloaded from [Hugging Face](https://huggingface.co/datasets/anvo25/vmmu) automatically and the API provider is picked from the model name, so only `--model` changes between models:
 
 ```bash
 # Evaluate single model
 python api_code/main_api.py \
   --model o3-2025-04-16 \
-  --prompt_language vn \
-  --input-file dataset/metadata/cropped_random_subset_vqa_description.json
+  --split full_vqa \
+  --prompt_language vn
+
+python api_code/main_api.py --model claude-sonnet-4-20250514 --split full_vqa --prompt_language vn
+python api_code/main_api.py --model google/gemini-2.5-flash --split full_vqa --prompt_language vn
+python api_code/main_api.py --model qwen/qwen2.5-vl-72b-instruct --split full_vqa --prompt_language vn
 
 # Cross-lingual evaluation
 python api_code/main_api.py \
   --model gpt-4.1-2025-04-14 \
-  --prompt_language en \
-  --input-file dataset/metadata/full_vqa.json
+  --split full_vqa \
+  --prompt_language en
+
+# Quick test on the first 5 questions
+python api_code/main_api.py --model gpt-4.1-2025-04-14 --split random_subset_vqa --test 5
 ```
 
-### 3. Analyze results
+Available splits: `full_vqa`, `random_subset_vqa`, `random_subset_ocr`, `cropped_random_subset_vqa`, `cropped_random_subset_vqa_description` (the `cropped_*` splits only have Vietnamese prompts).
+
+Results are saved to `results/<model>/<split>_<prompt_language>.json`; running the same command again only retries missing questions. When the run finishes, the accuracy is printed right away:
+
+```
+o3-2025-04-16 | full_vqa_vn.json | 2548 questions
+|Subject     |    N| Extraction| Accuracy|
+|------------|-----|-----------|---------|
+|Math        |  456|        ...|      ...|
+|...         |     |           |         |
+|Overall     | 2548|        ...|      ...|
+|Mean        |     |        ...|      ...|
+```
+
+Other options: `--provider` (force `openai` / `claude` / `gemini` / `openrouter` / `aya`), `--reasoning-effort` (o3, gpt-5, claude-opus-4-6), `--temperature`, `--concurrency`, `--openrouter-ignore-providers`, `--input-file` (local metadata JSON instead of `--split`), `--output-dir`. See `python api_code/main_api.py --help`.
+
+### 4. Compare models
 
 ```bash
 python src/result.py
 ```
+
+Prints the extraction-rate and accuracy tables of all models in `results/` and saves them to `results/analysis_<split>_<prompt_language>.csv`.
 
 ---
 
@@ -163,21 +189,19 @@ We provide web-based tools for:
 ## 🗂️ Repository Structure
 
 ```
-viexam/
-├── api_code/                           # Individual VLM evaluation
+VMMU/
+├── api_code/                           # VLM evaluation
 │   ├── api_handlers/                   # API wrapper for VLMs
-│   ├── main_api.py                     # Main API call logic
-│   └── main_api_qwen.py               # Qwen-specific evaluation
-│
-├── batch_api_code/                     # Batch processing for large-scale evaluation
-│   ├── main_batch_prepare.py          # Prepare evaluation batches
-│   ├── main_batch_api.py              # Execute batch evaluation
-│   └── handlers/                      # Batch processing utilities
+│   └── main_api.py                     # Main API call logic
 │
 ├── dataset/
-│   ├── question_image/                # Individual exam questions by domain
+│   ├── random_subset/                 # Sample exam questions by domain
 │   ├── metadata/                      # Question annotations and ground truth
-│   └── images/                        # Dataset overview images
+│   └── hf/                            # Images downloaded from Hugging Face (not tracked)
+│
+├── images/                            # Dataset overview images
+├── vmmu_dataset.py                    # Loads a split from Hugging Face
+├── requirements.txt
 │
 ├── src/                               # Full pipeline for data extraction
 │   ├── cut_question.py               # Question boundary detection
@@ -187,7 +211,7 @@ viexam/
 │   ├── ocr_ground_truth.html         # OCR verification tool
 │   └── result.py                     # Accuracy analysis
 │
-└── api_key/                          # API credentials (not tracked)
+└── api_key/                          # API credentials (or use environment variables)
     ├── claude_key.txt
     ├── openai_key.txt
     └── ...
@@ -199,13 +223,9 @@ viexam/
 
 Our evaluation reveals several important insights:
 
-1. **Strong OCR Performance:** VLMs achieve strong OCR performance on Vietnamese text (6% CER and 9% WER), confirming that poor performance stems from multimodal reasoning challenges rather than basic text recognition failures
-2. **Performance Gap:** SOTA VLMs achieve only 57% mean accuracy across 7 domains, with Geography most accessible (72%) and Physics most challenging (44%)
-3. **Thinking Models Excel:** The thinking VLM o3 substantially outperforms non-thinking VLMs (74% vs. 48-59%)
-4. **Option B Bias:** VLMs exhibit significant bias toward option B (31%) in multiple-choice questions, suggesting failures are not purely due to reasoning limitations but may be partially attributable to training data bias
-5. **Multimodal Challenge:** VLMs perform better on text-only questions (70%) versus multimodal questions (61%), confirming that multimodal integration poses fundamental challenges
-6. **Open-source Gap:** Open-source VLMs achieve substantially lower performance than closed-source/SOTA VLMs (27.7% vs. 57%)
-7. **Cross-lingual Mixed Results:** Cross-lingual prompting shows mixed results - improving open-source VLMs (+2.9%) while hurting SOTA VLMs (-1.0%)
-8. **Human-AI Collaboration:** Human-in-the-loop collaboration provides modest gains with OCR help (+0.48%) but substantial improvement with full text and image editing (+5.71%)
+1. **Thinking models perform best, but no model is reliable yet:** Open-source VLMs average only 37.35% accuracy and non-thinking closed-source VLMs 57.83%, both below the average Vietnamese high-school student (66.54%). Test-time compute via thinking models raises accuracy to 78.34% (best: Gemini-3-Pro, 86.33%), but this remains well below the expert reference (99.60%). IQ Test is consistently the hardest domain, while Geography and Math are comparatively easier
+2. **OCR is a major bottleneck for open-source VLMs but not for closed-source ones:** Closed-source VLMs read embedded Vietnamese text reliably (mean BLEU 89.01%, CER 6.59%, WER 9.33%), while open-source VLMs score substantially lower (mean BLEU 57.98%). Open-source failures are therefore partly attributable to OCR, whereas closed-source failures point to multimodal grounding and reasoning
+3. **Separating text from visual evidence improves reliability:** Giving the question and options as text alongside a crop of the visual evidence improves every evaluated VLM, by +7.97 points on average (+9.65 open-source, +8.56 non-thinking closed-source, +2.10 thinking closed-source), because models no longer have to read dense in-image text while grounding the visual evidence
+4. **English translation does not help:** Translating both the text and the in-image text into English reduces accuracy by 2.47 points on average for closed-source VLMs, so native-language multimodal evaluation cannot be replaced by translation, even for models trained predominantly on English
 
 ---

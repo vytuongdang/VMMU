@@ -7,6 +7,8 @@ import threading
 
 thread_local = {}
 
+API_KEY_ENV = "COHERE_API_KEY"
+
 def get_api_key_path():
     """Returns the default path for the Cohere API key."""
     return "api_key/cohere_key.txt"

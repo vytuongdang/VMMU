@@ -1,9 +1,11 @@
-
+# api_handlers/openrouter_handler.py
 import base64
 import json
 import time
-import requests 
+import requests
 from urllib.parse import urlparse
+
+API_KEY_ENV = "OPENROUTER_API_KEY"
 
 def get_api_key_path():
     """Returns the default path for the OpenRouter API key file."""
@@ -26,31 +28,36 @@ def encode_image_to_base64(image_path):
         print(f"ERROR: Image file not found at {image_path}")
         raise
 
-def make_api_call(api_key, model, prompt, image_path, temperature, ignore_providers=None):
+def make_api_call(api_key, model, prompt, image_path=None, temperature=0, ignore_providers=None):
     """Makes an API call to OpenRouter using requests."""
-    # Handle image (URL or local file)
-    if is_url(image_path):
-        image_content = {'type': 'image_url', 'image_url': {'url': image_path}}
-    else:
-        base64_image = encode_image_to_base64(image_path)
-        image_content = {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}}
-    
     # Build headers
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Content-Type': 'application/json',
-        "HTTP-Referer": "https://github.com/your-repo", 
-        "X-Title": "xxxxx",
+        "HTTP-Referer": "https://github.com/vytuongdang/VMMU",
+        "X-Title": "VMMU",
     }
+
+    # Build message content based on whether image_path is provided
+    content = [{'type': 'text', 'text': prompt}]
+
+    if image_path:
+        # Handle image (URL or local file)
+        if is_url(image_path):
+            image_content = {'type': 'image_url', 'image_url': {'url': image_path}}
+        else:
+            base64_image = encode_image_to_base64(image_path)
+            image_content = {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}}
+        content.append(image_content)
 
     # Build payload
     payload = {
         'model': model,
         'temperature': temperature,
-        'messages': [{'role': 'user', 'content': [{'type': 'text', 'text': prompt}, image_content]}]
+        'messages': [{'role': 'user', 'content': content}]
     }
-    
-    # Add provider preferences to the payload 
+
+    # Add provider preferences to the payload
     if ignore_providers:
         provider_prefs = {'ignore': [p.strip() for p in ignore_providers.split(',')]}
         payload['provider'] = provider_prefs
@@ -61,13 +68,14 @@ def make_api_call(api_key, model, prompt, image_path, temperature, ignore_provid
             response = requests.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers=headers,
-                data=json.dumps(payload)
+                data=json.dumps(payload),
+                timeout=120
             )
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Attempt {attempt+1} failed for {image_path} with model {model}: {e}")
-            if attempt < 2: 
+            if attempt < 2:
                 print("Retrying in 60 seconds...")
                 time.sleep(60)
             else:
@@ -76,15 +84,15 @@ def make_api_call(api_key, model, prompt, image_path, temperature, ignore_provid
 def process_item(item, api_key, model, temperature, prompt_lang, ignore_providers=None):
     """Main processing function called by main_api.py"""
     item_id = item['ID']
-    image_path = item['image_path']
-    
+    image_path = item.get('image_path')  # Use .get() to allow None
+
     prompt_key = f"{prompt_lang}_prompt"
     prompt_text = item.get(prompt_key)
-    
+
     if not prompt_text:
         print(f"ERROR: Item {item_id} is missing '{prompt_key}'. Skipping.")
         return None
-        
+
     print(f"Processing {item_id} with model {model}...")
     try:
         response_dict = make_api_call(api_key, model, prompt_text, image_path, temperature, ignore_providers)

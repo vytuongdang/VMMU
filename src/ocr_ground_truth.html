@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViExam JSON Editor - Step by Step</title>
+    <title>VMMU JSON Editor - Step by Step</title>
     <!-- JSZip library for creating ZIP files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- FileSaver.js library for saving files -->
@@ -631,7 +631,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>ViExam OCR - Ground Truth</h1>
+        <h1>VMMU OCR - Ground Truth</h1>
         
         <!-- Setup Steps -->
         <div class="setup-container" id="setupContainer">
@@ -1286,7 +1286,7 @@
             
             try {
                 const content = await zip.generateAsync({ type: 'blob' });
-                saveAs(content, `ViExam_Edited_${fileData.fileName.replace('.json', '')}.zip`);
+                saveAs(content, `VMMU_Edited_${fileData.fileName.replace('.json', '')}.zip`);
                 showMessage(`Successfully downloaded ZIP file!`, 'success');
                 
                 fileData.modifiedQuestionIds.clear();
