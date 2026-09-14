@@ -107,7 +107,7 @@ def main():
     parser.add_argument("--provider", type=str, default=None, choices=PROVIDERS, help="API provider. Default: detected from the model name (e.g. use --provider gemini to call Google's API directly instead of OpenRouter).")
     data_group = parser.add_mutually_exclusive_group()
     data_group.add_argument("--split", type=str, default=None, choices=SPLITS, help="VMMU split to download from Hugging Face (anvo25/vmmu). Default: full_vqa.")
-    data_group.add_argument("--input-file", type=str, default=None, help="Local metadata JSON instead of --split (e.g. dataset/metadata/random_subset_vqa.json); its image_path files must exist.")
+    data_group.add_argument("--input-file", type=str, default=None, help="Local metadata JSON (same fields as the Hugging Face dataset) instead of --split; its image_path files must exist.")
     parser.add_argument("--output-file", type=str, default=None, help="Optional: Manually specify output file path.")
     parser.add_argument("--output-dir", type=str, default=None, help="Base directory for saving result files. Default: results/ in the repo root.")
     parser.add_argument("--temperature", type=float, default=0.0, help="Temperature for the model")
@@ -154,7 +154,7 @@ def main():
         missing = [item['image_path'] for item in data if item.get('image_path') and not os.path.exists(item['image_path'])]
         if missing:
             raise FileNotFoundError(f"{len(missing)} image(s) listed in {args.input_file} are missing (e.g. {missing[0]}). "
-                                    f"The repo only ships a few sample images; use --split to download the dataset from Hugging Face.")
+                                    f"Use --split to download the dataset and its images from Hugging Face.")
     else:
         split = args.split or "full_vqa"
         data = load_split(split, limit=args.test)

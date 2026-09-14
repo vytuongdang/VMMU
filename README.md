@@ -97,8 +97,8 @@ VMMU spans **7 distinct domains** representative of Vietnamese educational asses
 - **Geography**: Data visualization, economic geography (481 questions)
 
 ### Practical Assessments (Tasks 6-7)
-- **[Driving Test](dataset/question_image/driving/)**: Traffic rules, road signs, safety scenarios (367 questions)
-- **[IQ Test](dataset/question_image/iq/)**: Pattern recognition, logical reasoning (240 questions)
+- **Driving Test**: Traffic rules, road signs, safety scenarios (367 questions)
+- **IQ Test**: Pattern recognition, logical reasoning (240 questions)
 
 *All questions integrate Vietnamese text with visual elements (diagrams, charts, illustrations) at multiple resolutions.*
 
@@ -194,10 +194,7 @@ VMMU/
 │   ├── api_handlers/                   # API wrapper for VLMs
 │   └── main_api.py                     # Main API call logic
 │
-├── dataset/
-│   ├── random_subset/                 # Sample exam questions by domain
-│   ├── metadata/                      # Question annotations and ground truth
-│   └── hf/                            # Images downloaded from Hugging Face (not tracked)
+├── dataset/                           # Images downloaded from Hugging Face on first run (not tracked)
 │
 ├── images/                            # Dataset overview images
 ├── vmmu_dataset.py                    # Loads a split from Hugging Face
