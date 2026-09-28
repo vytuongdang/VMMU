@@ -28,7 +28,7 @@
 ## Abstract
 
 <p align="center">
-  <img src="./images/overview.png" alt="VMMU overview" width="60%"/>
+  <img src="./images/samples.png" alt="Sample VMMU questions from all seven domains, with the ground truth and o3 answer for each" width="100%"/>
 </p>
 
 *Vision language models are predominantly evaluated on English-centric multimodal benchmarks, leaving their behavior in other languages and cultures insufficiently understood. We introduce **VMMU**, a Vietnamese Multitask Multimodal Understanding and Reasoning benchmark of **2,548 multiple-choice questions** across seven domains: Mathematics, Physics, Chemistry, Biology, Geography, Driving Test, and IQ Test. Every question requires jointly reasoning over Vietnamese text and non-text visual evidence (charts, diagrams, tables, traffic scenes), and is distributed as a single rendered page image. We evaluate 10 open-source and 5 closed-source VLMs on VMMU. Test-time compute improves performance from **57%** to **78%** accuracy, but it remains inferior to an expert baseline (**99%** accuracy). Extensive error analyses show that closed-source VLMs already achieve strong Vietnamese OCR performance, yet still struggle on VMMU. This suggests that the primary bottleneck is **multimodal grounding and reasoning** rather than text recognition or Vietnamese language understanding.*
