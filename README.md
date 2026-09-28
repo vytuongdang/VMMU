@@ -69,19 +69,9 @@ cd VMMU
 pip install -r requirements.txt
 ```
 
-### 2.2 Add your API key
+Set the API key of your provider as an environment variable (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, or `COHERE_API_KEY`), or put it in its file under `api_key/`.
 
-Set the environment variable of the provider you use (or put the key in its file under `api_key/`):
-
-| Provider | Environment variable | Key file | Models |
-| --- | --- | --- | --- |
-| OpenAI | `OPENAI_API_KEY` | `api_key/openai_key.txt` | `gpt-*`, `o3-*` |
-| Anthropic | `ANTHROPIC_API_KEY` | `api_key/claude_key.txt` | `claude-*` |
-| OpenRouter | `OPENROUTER_API_KEY` | `api_key/openrouter_key.txt` | `google/gemini-*`, `qwen/*`, `meta-llama/*`, `mistralai/*`, ... |
-| Google | `GEMINI_API_KEY` | `api_key/gemini_key.txt` | `gemini-*` with `--provider gemini` |
-| Cohere | `COHERE_API_KEY` | `api_key/cohere_key.txt` | `c4ai-aya-vision-*` |
-
-### 2.3 Run
+### 2.2 Run
 
 The dataset is downloaded from Hugging Face on the first run, and the API provider is picked from the model name, so only `--model` changes between models:
 
@@ -122,7 +112,7 @@ o3-2025-04-16 | full_vqa_vn.json | 2548 questions
 
 Other options: `--provider` (force `openai` / `claude` / `gemini` / `openrouter` / `aya`), `--reasoning-effort` (o3, gpt-5, claude-opus-4-6), `--temperature`, `--concurrency`, `--openrouter-ignore-providers`, `--input-file` (local metadata JSON instead of `--split`), `--output-dir`. See `python api_code/main_api.py --help`.
 
-### 2.4 Compare models
+### 2.3 Compare models
 
 ```bash
 python src/result.py
